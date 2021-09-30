@@ -5,17 +5,20 @@ import com.hobbyprojects.springboot.dtos.RestaurantCreationRequest;
 import com.hobbyprojects.springboot.dtos.RestaurantInformation;
 import com.hobbyprojects.springboot.entities.Restaurant;
 import com.hobbyprojects.springboot.repositories.RestaurantRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
+@Transactional
 public class RestaurantService {
-    @Autowired
-    private RestaurantRepository restaurantRepository;
+
+    private final RestaurantRepository restaurantRepository;
 
     public RestaurantInformation getRestaurantDetails(long id) {
         Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);

@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class User {
     private String name;
     private String email;
