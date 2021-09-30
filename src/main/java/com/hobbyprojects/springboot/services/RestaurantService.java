@@ -1,11 +1,11 @@
 package com.hobbyprojects.springboot.services;
 
 import com.hobbyprojects.springboot.dtos.AllRestaurantInformation;
+import com.hobbyprojects.springboot.dtos.RestaurantCreationRequest;
 import com.hobbyprojects.springboot.dtos.RestaurantInformation;
 import com.hobbyprojects.springboot.entities.Restaurant;
 import com.hobbyprojects.springboot.repositories.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,40 +17,33 @@ public class RestaurantService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
-
     public RestaurantInformation getRestaurantDetails(long id) {
         Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);
-        if(restaurantOptional.isPresent()) {
-            Restaurant restaurant = restaurantOptional.get();
-            RestaurantInformation restaurantInformation = new RestaurantInformation();
-            restaurantInformation.setName(restaurant.getName());
-            restaurantInformation.setCategory("Category");
-            restaurantInformation.setPicture("Picture");
-            restaurantInformation.setRating(5.0);
-            restaurantInformation.setAverageCostPerPerson(200);
-            return restaurantInformation;
-        }
-        else {
-            return null;
-        }
+        return restaurantOptional.map(Restaurant::toRestaurantInformation).orElse(null);
     }
 
     public AllRestaurantInformation getAllRestaurantInformation() {
-        List<Restaurant> allRestaurants = restaurantRepository.findAll();
+        List<RestaurantInformation> allRestaurantInfo = restaurantRepository.findAll().stream().map(Restaurant::toRestaurantInformation).collect(Collectors.toList());
         AllRestaurantInformation allRestaurantInformation = new AllRestaurantInformation();
-        allRestaurantInformation.setRestaurants(convertToRestaurantInformation(allRestaurants));
+        allRestaurantInformation.setRestaurants(allRestaurantInfo);
         return allRestaurantInformation;
 
     }
 
-    private List<RestaurantInformation> convertToRestaurantInformation(List<Restaurant> allRestaurants) {
-        allRestaurants.stream().map( restaurant -> {
-            RestaurantInformation restaurantInformation = new RestaurantInformation();
-            restaurantInformation.setName(restaurant.getName());
-            return restaurantInformation;
-        }).collect(Collectors.toList());
-        return null;
+    public void createRestaurant(RestaurantCreationRequest restaurantCreationRequest) {
+        Restaurant restaurant = restaurantCreationRequest.toRestaurantEntity();
+        restaurantRepository.save(restaurant);
     }
 
+    public AllRestaurantInformation getRestaurantsByCategory(String category) {
+        List<RestaurantInformation> allRestaurantInfo = restaurantRepository.findAll().stream().filter( restaurant -> category.equals(String.valueOf(restaurant.getCategory()))).map(Restaurant::toRestaurantInformation).collect(Collectors.toList());
+        AllRestaurantInformation allRestaurantInformation = new AllRestaurantInformation();
+        allRestaurantInformation.setRestaurants(allRestaurantInfo);
+        return allRestaurantInformation;
+    }
 
+    public void deleteRestaurantById(long id) {
+        restaurantRepository.deleteById(id);
+
+    }
 }
