@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Primary;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +24,8 @@ public class Restaurant {
     private double rating;
     private int averageCost;
     private String profilePicture;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Menu menu;
 
     public RestaurantInformation toRestaurantInformation() {
         RestaurantInformation restaurantInformation = new RestaurantInformation();
